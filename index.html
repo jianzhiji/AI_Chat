@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChatGPT 3.5-turbo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #121212; /* 暗色背景 */
+      color: #fff; /* 白色文字 */
+    }
+
+    body {
+      /* 其他样式保持不变 */
+      background-image: url("https://github.com/jianzhiji/Chat_GPT_HTML/blob/main/586.png?raw=true.png");
+      background-size: cover; /* 使图片扩展到覆盖整个页面 */
+      background-position: center; /* 使图片居中显示 */
+      background-repeat: no-repeat; /* 防止图片重复 */
+    }
+
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      height: 80vh;
+      padding: 20px;
+      background-color: #1e1e1e; /* 暗色容器背景 */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0.5; /* 设置透明度为50% */
+  
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff; /* 白色标题 */
+    }
+
+    .chat-log {
+      flex: 1;
+      overflow-y: scroll;
+      padding-right: 10px;
+      border-right: 1px solid #333; /* 暗色边框 */
+      margin-bottom: 20px;
+      background-color: #2d2d2d; /* 暗色聊天记录背景 */
+    }
+
+    .user-message {
+      background-color: #3f3f3f; /* 暗色用户消息背景 */
+      color: #fff;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      align-self: flex-end;
+    }
+
+    .ai-message {
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #333; /* 暗色边框 */
+      border-radius: 5px;
+      background-color: #2d2d2d; /* 暗色输入框背景 */
+      color: #fff; /* 白色输入框文字 */
+    }
+
+    .send-button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 10px;
+      color: #fff; /* 白色加载文字 */
+    }
+  </style>
+  
+</head>
+
+<body>
+  <div class="container">
+    <h1>ChatGPT 3.5-turbo</h1>
+    <div class="chat-log" id="chatLog"></div>
+    <div class="input-container">
+      <input class="input" id="inputMessage" placeholder="请输入消息"></input>
+      <button class="send-button" onclick="sendMessage()">发送</button>
+    </div>
+    <div class="loading" id="loading" style="display: none;">正在加载...</div>
+  </div>
+
+
+  
+  
+  <script>
+    const chatLog = document.getElementById('chatLog');
+    const inputMessage = document.getElementById('inputMessage');
+    const loading = document.getElementById('loading');
+
+    function sendMessage() {
+      const message = inputMessage.value.trim();
+
+      if (message === '') {
+        return;
+      }
+
+      addMessageToChatLog(message, 'user-message');
+      inputMessage.value = '';
+
+      // 显示加载指示器
+      loading.style.display = 'block';
+
+      // 发送消息到服务器（ChatGPT）进行处理
+      sendRequestToChatGPT(message);
+    }
+
+    function sendRequestToChatGPT(message) {
+      // 构建请求对象
+      const request = {
+        "model": "gpt-3.5-turbo",
+        "messages": [{
+          "role": "user",
+          "content": message
+        }]
+      };
+
+      // 发送请求到服务器（这里使用示例的URL，根据实际情况修改）
+      fetch('https://api.chatanywhere.com.cn/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+        'Authorization': 'sk-nejgbSZirjUTB61dynxVk6NHdFgSkDGtcCHsKFYWBNDx5WHg',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        const reply = data.choices[0].message.content;
+
+        // 将服务器返回的回复添加到聊天记录中
+        addMessageToChatLog(reply, 'ai-message');
+      })
+      .catch(error => {
+        console.error('请求ChatGPT时出错:', error);
+        alert('请求ChatGPT时出错，请稍后再试。');
+      })
+      .finally(() => {
+        // 隐藏加载指示器
+        loading.style.display = 'none';
+      });
+    }
+
+    function addMessageToChatLog(message, className) {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = message;
+      messageElement.classList.add(className);
+      chatLog.appendChild(messageElement);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  </script>
+  
+</body>
+
+  <footer style="text-align: right; padding: 100px 0px; border-top: 1px solid #444; display: flex; flex-direction: column ; align-items: flex-end;">
+  天雾雨涟水 
+  <small style="color: #aaa;">简介：接入chatGPT3对话网页，5</small>
+  <small style="color: #aaa;">本页面为静态网站，部署在github：</small>
+  <small style="color: #0cc79e;">https://jianzhiji.github.io/Chat_GPT_HTML/</small>
+  <small style="color: #595d5c;">html的内容很多，之后再慢慢优化界面</small>
+  <small style="color: #595d5c;">将就着先用^V^</small>
+  <footer style="text-align: right; padding: 0px 0px; border-top: 1px solid #444; display: flex; flex-direction: column ; align-items: flex-end;">
+  <small style="color: #595d5c;">给自己引流~</small>
+  <small style="color: #97a19e;">个人博客链接:</small>
+  <small style="color: #25c099;">https://www.cnblogs.com/tianwuyvlianshui/</small>
+  <small style="color: #97a19e;">Gitee链接:</small>
+  <small style="color: #25c099;">https://gitee.com/sword-level_0/</small>
+  <small style="color: #97a19e;">Github链接:</small>
+  <small style="color: #25c099;">https://github.com/jianzhiji/</small>
+    
+</footer>
+
+
+
+
+</body>
+
+</html>
